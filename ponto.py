@@ -3,28 +3,40 @@ from datetime import datetime
 import sys
 
 
-class Recorder:
+class Utility:
+    def __init__(self, path: str, delimiter: str, mode: str):
+        self.__path: str = path
+        self._file = None
+        self.__delimiter: str = delimiter
+        self.__mode: str = mode
+
+    def _open(self):
+        print("OPEN")
+        self._file = open(file=self.__path, mode=self.__mode)
+
+    def _close(self):
+        print("CLOSE")
+        self._file.close()
+
+    @property
+    def get_delimiter(self) -> str:
+        return self.__delimiter
+
+
+class Recorder(Utility):
     """This is a class that makes the records of the data in the CSV"""
 
-    def __init__(self, path, delimiter):
-        self.__path = path
-        self.__file = None
-        self.__delimiter = delimiter
-
-    def __open(self):
-        self.__file = open(file=self.__path, mode="a")
-
-    def __close(self):
-        self.__file.close()
+    def __init__(self, path: str, delimiter: str, mode: str):
+        super().__init__(path, delimiter, mode)
 
     def registrar(self, type, time, user_name):
-        self.__open()
-        self.__file.write(
-            f"{type}{self.__delimiter}"
-            f"{time.timestamp()}{self.__delimiter}"
+        self._open()
+        self._file.write(
+            f"{type}{self.get_delimiter}"
+            f"{time.timestamp()}{self.get_delimiter}"
             f"{user_name}\n"
         )
-        self.__close()
+        self._close()
 
 
 def list_data():
@@ -57,7 +69,7 @@ def list_data():
 
 def main():
     registrador: Recorder = Recorder(
-        path="/home/lucas/Projetos/DNosPonto/ponto.csv", delimiter=","
+        path="/home/lucas/Projetos/DNosPonto/ponto.csv", delimiter=",", mode="a"
     )
     try:
         tipo = sys.argv[1].upper()  # Primeiro argumento: I (entrada) ou O (saída)
