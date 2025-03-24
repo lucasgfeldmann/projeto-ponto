@@ -3,7 +3,9 @@ from datetime import datetime
 import sys
 
 
-class Registrador:
+class Recorder:
+    """This is a class that makes the records of the data in the CSV"""
+
     def __init__(self, path, delimiter):
         self.__path = path
         self.__file = None
@@ -54,7 +56,7 @@ def list_data():
 
 
 def main():
-    registrador: Registrador = Registrador(
+    registrador: Recorder = Recorder(
         path="/home/lucas/Projetos/DNosPonto/ponto.csv", delimiter=","
     )
     try:
