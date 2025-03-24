@@ -26,8 +26,8 @@ class Utility:
 class Recorder(Utility):
     """This is a class that makes the records of the data in the CSV"""
 
-    def __init__(self, path: str, delimiter: str, mode: str):
-        super().__init__(path, delimiter, mode)
+    def __init__(self, path: str, delimiter: str):
+        super().__init__(path, delimiter, "a")
 
     def registrar(self, type, time, user_name):
         self._open()
@@ -69,7 +69,7 @@ def list_data():
 
 def main():
     registrador: Recorder = Recorder(
-        path="/home/lucas/Projetos/DNosPonto/ponto.csv", delimiter=",", mode="a"
+        path="/home/lucas/Projetos/DNosPonto/ponto.csv", delimiter=","
     )
     try:
         tipo = sys.argv[1].upper()  # Primeiro argumento: I (entrada) ou O (saída)
