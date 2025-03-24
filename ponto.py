@@ -1,5 +1,5 @@
 from csv import DictReader
-from datetime import datetime
+from datetime import datetime, date
 import sys
 
 
@@ -86,6 +86,11 @@ class ListProvider(DictUtility):
     def show(self):
         ListProvider.recursive_show(self.to_dict())
 
+    def show_day(self, user: str, date_target: date):
+        filtred_data = self.to_dict()[user][date_target]
+        print("----", date_target, "----")
+        ListProvider.recursive_show(filtred_data)
+
     def all_records(self):
         lines = self._file.readlines()
         for line in lines:
@@ -131,7 +136,8 @@ def main():
         tipo = sys.argv[1].upper()  # Primeiro argumento: I (entrada) ou O (saída)
 
         if tipo == "L":
-            provider.show()
+            # provider.show()
+            provider.show_day("Lucas", date(year=2025, month=3, day=24))
             # list_data()
             return
 
