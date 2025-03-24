@@ -10,17 +10,31 @@ class Utility:
         self.__delimiter: str = delimiter
         self.__mode: str = mode
 
+        self._open()
+
     def _open(self):
-        print("OPEN")
         self._file = open(file=self.__path, mode=self.__mode)
 
     def _close(self):
-        print("CLOSE")
         self._file.close()
 
     @property
-    def get_delimiter(self) -> str:
+    def delimiter(self) -> str:
         return self.__delimiter
+
+
+class DictUtility(Utility):
+    def __init__(self, path: str, delimiter: str, mode: str):
+        self._dict = None
+        super().__init__(path, delimiter, mode)
+
+    def _open(self):
+        super()._open()
+        self._dict = DictReader(self._file, delimiter=self.delimiter)
+
+    def _close(self):
+        super()._close()
+        self._dict = None
 
 
 class Recorder(Utility):
@@ -30,13 +44,52 @@ class Recorder(Utility):
         super().__init__(path, delimiter, "a")
 
     def registrar(self, type, time, user_name):
-        self._open()
         self._file.write(
-            f"{type}{self.get_delimiter}"
-            f"{time.timestamp()}{self.get_delimiter}"
+            f"{type}{self.delimiter}"
+            f"{time.timestamp()}{self.delimiter}"
             f"{user_name}\n"
         )
         self._close()
+
+
+class ListProvider(DictUtility):
+    def __init__(self, path: str, delimiter: str):
+        super().__init__(path, delimiter, "r")
+
+    def to_dict(self) -> dict:
+        data: dict = dict()
+        for line in self._dict:
+            timestamp = datetime.fromtimestamp(float(line["DATETIME"]))
+            date = timestamp.date()
+
+            if line["PESSOA"] not in data:
+                data[line["PESSOA"]] = {date: {"I": [], "O": []}}
+
+            if date not in data[line["PESSOA"]]:
+                data[line["PESSOA"]][date] = {"I": [], "O": []}
+
+            data[line["PESSOA"]][date][line["TIPO"]].append(timestamp)
+
+        return data
+
+    @staticmethod
+    def recursive_show(data, tab=0):
+        if type(data) == dict:
+            for i, v in data.items():
+                print(f"{tab * " "}{"|__" if tab else ""}{i}")
+                if v:
+                    ListProvider.recursive_show(v, tab + 3)
+        elif type(data) == list:
+            for i in data:
+                print(f"{tab * " "}{i}")
+
+    def show(self):
+        ListProvider.recursive_show(self.to_dict())
+
+    def all_records(self):
+        lines = self._file.readlines()
+        for line in lines:
+            print(line)
 
 
 def list_data():
@@ -71,11 +124,15 @@ def main():
     registrador: Recorder = Recorder(
         path="/home/lucas/Projetos/DNosPonto/ponto.csv", delimiter=","
     )
+    provider: ListProvider = ListProvider(
+        path="/home/lucas/Projetos/DNosPonto/ponto.csv", delimiter=","
+    )
     try:
         tipo = sys.argv[1].upper()  # Primeiro argumento: I (entrada) ou O (saída)
 
         if tipo == "L":
-            list_data()
+            provider.show()
+            # list_data()
             return
 
         horario_str = sys.argv[
