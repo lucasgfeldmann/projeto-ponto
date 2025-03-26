@@ -1,6 +1,8 @@
 from csv import DictReader
 from datetime import datetime
 import sys
+
+from Resume import Resume
 from Recorder import Recorder
 from ListProvider import ListProvider
 
@@ -39,6 +41,7 @@ def main():
     provider: ListProvider = ListProvider(
         path="/home/lucas/Projetos/DNosPonto/ponto.csv", delimiter=","
     )
+    resume = Resume(provider.to_dict(), "Lucas")
     try:
         tipo = sys.argv[1].upper()  # Primeiro argumento: I (entrada) ou O (saída)
 
@@ -46,6 +49,11 @@ def main():
             # provider.show()
             # provider.show_day("Lucas", date(year=2025, month=3, day=24))
             list_data()
+            return
+
+        if tipo == "R":
+            print("Resumo")
+            print(resume.today())
             return
 
         horario_str = sys.argv[
